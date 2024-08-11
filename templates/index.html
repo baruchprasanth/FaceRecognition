@@ -227,24 +227,20 @@
                 ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
                 ctx.scale(-1, 1);
                 let image = canvas.toDataURL('image/jpeg');
-
-                if (!location) {
-                    document.getElementById('status').innerText = "Error in getting Location";
-                    return;
-                }
-                else{
-                    axios.post('/login', { 
-                        image: image, 
-                        location:location })
-                    .then(response => {
-                        capturedEncoding = response.data.encoding;
-                        document.getElementById('status').innerText = response.data.message;
-                    })
-                    .catch(error => {
-                        document.getElementById('status').innerText = "Error: " + error.response.data.error;
+                getLocation().then(location => {
+                        axios.post('/login', { 
+                            image: image, 
+                            location: location
+                        })
+                        .then(response => {
+                            document.getElementById('status').innerText = response.data.message;
+                            capturedEncoding = null;
+                        })
+                        .catch(error => {
+                            document.getElementById('status').innerText = "Error: " + error.response.data.error;
+                            capturedEncoding = null;
+                        });
                     });
-                    document.getElementById('status').innerText = response.data.message;
-                }
             }
 /*================================================================================================================*/
             function getLocation() {
