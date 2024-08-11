@@ -160,16 +160,16 @@
         <div class="container">
             <h1>Facial Recognition System</h1>
     
-            <h2>Login</h2>
+            <h2>Registration</h2>
     
             <div id="video-container">
                 <video id="video" autoplay></video>
             </div>
             <canvas id="canvas"></canvas>
-            <button id="recordButton" onclick="loginWithFace()">Capture</button>
+            <button id="recordButton" onclick="registerFace()">Register</button>
             <br>
+            <input type="text" id="userId" placeholder="Enter User ID">
             <div id="status"></div>
-            <div id="locationInfo"></div>
         </div>
     
         <script>
@@ -200,42 +200,23 @@
                 }           
             }
     
-            function captureImage() {
+            function registerFace() {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 ctx.scale(-1, 1);
                 ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
                 ctx.scale(-1, 1);
                 let image = canvas.toDataURL('image/jpeg');
-                
-                axios.post('/capture', { image: image })
-                    .then(response => {
-                        capturedEncoding = response.data.encoding;
-                        document.getElementById('status').innerText = "Image captured successfully";
-                        loginWithFace();
-                    })
-                    .catch(error => {
-                        document.getElementById('status').innerText = "Error: " + error.response.data.error;
-                    });
                     
-            }
-      
-            function loginWithFace() {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                ctx.scale(-1, 1);
-                ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-                ctx.scale(-1, 1);
-                let image = canvas.toDataURL('image/jpeg');
-
-                if (!location) {
-                    document.getElementById('status').innerText = "Error in getting Location";
+                let userId = document.getElementById('userId').value;
+                if (!userId) {
+                    document.getElementById('status').innerText = "Please enter a user ID and capture an image first";
                     return;
                 }
                 else{
-                    axios.post('/login', { 
+                    axios.post('/register', { 
                         image: image, 
-                        location:location })
+                        userId:userId })
                     .then(response => {
                         capturedEncoding = response.data.encoding;
                         document.getElementById('status').innerText = response.data.message;
@@ -245,8 +226,32 @@
                     });
                     document.getElementById('status').innerText = response.data.message;
                 }
+                
             }
-/*================================================================================================================*/
+    
+            function loginWithFace() {
+                if (!capturedEncoding) {
+                    document.getElementById('status').innerText = "Please capture an image first";
+                    return;
+                }
+    
+                getLocation().then(location => {
+                    axios.post('/login', { 
+                        faceEncoding: capturedEncoding,
+                        location: location
+                    })
+                    .then(response => {
+                        document.getElementById('status').innerText = response.data.message;
+                        capturedEncoding = null;
+                    })
+                    .catch(error => {
+                        document.getElementById('status').innerText = "Error: " + error.response.data.error;
+                        capturedEncoding = null;
+                    });
+                });
+                image
+            }
+    
             function getLocation() {
                 return new Promise((resolve, reject) => {
                     if ("geolocation" in navigator) {
