@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Recognition System</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { color: #333; }
+        button { margin: 10px 0; padding: 10px; cursor: pointer; }
+        #video, #canvas { width: 100%; max-width: 400px; }
+        #status { margin-top: 20px; padding: 10px; background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Facial Recognition System</h1>
+
+        <h2>Registration & Login</h2>
+
+        <video id="video" autoplay></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <br>
+        <button onclick="captureImage()">Capture Image</button>
+        <br>
+        <input type="text" id="userId" placeholder="Enter User ID">
+        <button onclick="registerFace()">Register Face</button>
+        <br>
+        <button onclick="loginWithFace()">Login with Face</button>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let capturedEncoding = null;
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => video.srcObject = stream)
+            .catch(err => console.error("Error accessing the camera:", err));
+
+        function captureImage() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            let image = canvas.toDataURL('image/jpeg');
+            
+            axios.post('/capture', { image: image })
+                .then(response => {
+                    capturedEncoding = response.data.encoding;
+                    document.getElementById('status').innerText = "Image captured successfully";
+                })
+                .catch(error => {
+                    document.getElementById('status').innerText = "Error: " + error.response.data.error;
+                });
+        }
+
+        function registerFace() {
+            let userId = document.getElementById('userId').value;
+            if (!userId || !capturedEncoding) {
+                document.getElementById('status').innerText = "Please enter a user ID and capture an image first";
+                return;
+            }
+
+            axios.post('/register', { userId: userId, faceEncoding: capturedEncoding })
+                .then(response => {
+                    document.getElementById('status').innerText = response.data.message;
+                })
+                .catch(error => {
+                    document.getElementById('status').innerText = "Error: " + error.response.data.error;
+                });
+        }
+
+        function loginWithFace() {
+            if (!capturedEncoding) {
+                document.getElementById('status').innerText = "Please capture an image first";
+                return;
+            }
+
+            axios.post('/login', { faceEncoding: capturedEncoding })
+                .then(response => {
+                    document.getElementById('status').innerText = response.data.message;
+                })
+                .catch(error => {
+                    document.getElementById('status').innerText = "Error: " + error.response.data.error;
+                });
+        }
+    </script>
+</body>
+</html>
