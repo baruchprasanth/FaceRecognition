@@ -1,0 +1,6 @@
+sNo,userID,faceDetection,loginDatetime,location
+1,1180562,True,2024-08-12 03:18:33.270196,"{'latitude': 1.39264, 'longitude': 103.8974976, 'city': 'Singapore', 'country': 'Singapore'}"
+2,67890,True,2024-08-12 03:18:55.712374,"{'latitude': 1.39264, 'longitude': 103.8974976, 'city': 'Singapore', 'country': 'Singapore'}"
+3,875466,True,2024-08-12 03:19:08.553660,"{'latitude': 1.39264, 'longitude': 103.8974976, 'city': 'Singapore', 'country': 'Singapore'}"
+4,1180562,True,2024-08-12 03:19:44.281775,"{'latitude': 1.39264, 'longitude': 103.8974976, 'city': 'Singapore', 'country': 'Singapore'}"
+5,114324,True,2024-08-12 03:21:13.652416,"{'latitude': 1.39264, 'longitude': 103.8974976, 'city': 'Singapore', 'country': 'Singapore'}"
