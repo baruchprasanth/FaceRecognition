@@ -181,5 +181,5 @@ def login():
 
 if __name__ == '__main__':
     port = find_free_port()
-#    print(f"Running on http://127.0.0.1:{port}")
-    app.run(debug=True, port=port)
+#    print(f"Running on http://127.0.0.1:48919")
+    app.run(debug=False, port=port)
